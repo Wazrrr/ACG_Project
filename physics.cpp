@@ -18,8 +18,8 @@ inline bool KEY(int key_code) {
 
 
 void initParticles() {
-	particle.push_back(Particle(glm::vec3(0.0f),glm::vec3(0.0f),PLANAR,false));
-	particle.push_back(Particle(glm::vec3((R[PLANAR]+R[PLAYER])),glm::vec3(0.0f),PLAYER,false));
+	particle.push_back(Particle(glm::vec3(0.0f),glm::vec3(0.0f),PLANET));
+	particle.push_back(Particle(glm::vec3((R[PLANET]+R[PLAYER])),glm::vec3(0.0f),PLAYER));
 }
 
 
@@ -29,7 +29,8 @@ void initPlayer() {
 	player.front=glm::normalize(glm::vec3(0.0f,player.up.z,-player.up.y));
 	player.hand_mode=SHOOT;
 	player.is_fine_tuning=false;
-	player.is_rough=false;
+	player.is_pausing=false;
+	player.dt=0.001f;
 }
 
 void updatePlayer() {
@@ -46,7 +47,7 @@ inline float fN(float d,float r1,float r2,float r,float k) {
 	if(d>r2&&d<rm)
 		return -k*(d-r2);
 	if(d>=rm&&d<r)
-		return k*(r-d);
+		return 5.0f*k*(r-d);
 	return 0.0f;
 }
 
@@ -89,11 +90,8 @@ void calculateF() {
 			} else {
 				if(d<r1||d>r2&&d<r) {
 					glm::vec3 n=glm::normalize(pr);
-					if(it->is_rough||jt->is_rough)
-						F+=fN(d,r1,r2,r,K[it->type][jt->type])*glm::normalize((jt->v)-(it->v));
-					else
-						F+=(-fN(d,r1,r2,r,K[it->type][jt->type])*n
-							+fF((jt->v)-(it->v),n,GAMMA_N[it->type][jt->type],GAMMA_TAU[it->type][jt->type]));
+					F+=(-fN(d,r1,r2,r,K[it->type][jt->type])*n
+						+fF((jt->v)-(it->v),n,GAMMA_N[it->type][jt->type],GAMMA_TAU[it->type][jt->type]));
 				}
 			}
 			if((it->type==PLAYER||jt->type==PLAYER)&&d<r)
@@ -128,6 +126,8 @@ void calculatePlayer() {
 
 void updateState(float dt) {
 	for(std::vector<Particle>::iterator it=particle.begin();it<particle.end();it++) {
+		if(player.is_pausing&&it->type!=PLAYER)
+			continue;
 		it->p+=(it->v)*dt;
 		it->v+=(it->F)*dt/M[it->type];
 	}
@@ -138,5 +138,5 @@ void evolution(float dt) {
 	calculateF();
 	calculatePlayer();
 	updateState(dt);
-}                
+}                 
 

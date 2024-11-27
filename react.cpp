@@ -31,7 +31,7 @@ inline IndexPoint getIntersection(glm::vec3 pos,glm::vec3 dir,float delta_r,bool
 	for(std::vector<Particle>::iterator it=particle.begin();it<particle.end();it++)
 		if(it->type!=PLAYER) {
 			float t_this=0.0f;
-			float r=(is_embed?0.5f*(R1[it->type]+R2[it->type]):R[it->type])+delta_r;
+			float r=(is_embed&&it->type==BLOCK?0.5f*(R1[it->type]+R2[it->type]):R[it->type])+delta_r;
 			glm::vec3 origin=it->p;
 			
 			float b_div_2=glm::dot(pos-origin,dir);
@@ -77,9 +77,13 @@ void keybd(unsigned char key,int x,int y) {
 	if(key=='3')
 		player.hand_mode=EMBED;
 	if(key=='z')
-		player.is_rough=true;
+		player.is_pausing=true;
 	if(key=='x')
-		player.is_rough=false;
+		player.is_pausing=false;
+	if(key=='c')
+		player.dt+=0.001f;
+	if(key=='v'&&player.dt>0.001f)
+		player.dt-=0.001f;
 }
 void mouse(int button,int state,int x,int y) {
 	glm::vec3 dir=camera.getDir(player);
@@ -87,7 +91,7 @@ void mouse(int button,int state,int x,int y) {
 	if(state==GLUT_DOWN)
 		return;
 	if(button==GLUT_LEFT_BUTTON) {
-		IndexPoint ip=getIntersection(player.pos,dir,0.0f,player.hand_mode==EMBED);
+		IndexPoint ip=getIntersection(player.pos,dir,0.0f,false);
 		if(ip.i==-1)
 			return;
 		if(particle[ip.i].type==BLOCK)
@@ -95,16 +99,22 @@ void mouse(int button,int state,int x,int y) {
 		return;
 	}
 	if(player.hand_mode==SHOOT) {
-		particle.push_back(Particle(player.pos+(R[PLAYER]+R[BLOCK])*dir,V_SHOOT*dir,BLOCK,player.is_rough));
+		particle.push_back(Particle(player.pos+(R[PLAYER]+R[BLOCK])*dir,V_SHOOT*dir,BLOCK));
 		return;
 	}
 	if(player.hand_mode==SET||player.hand_mode==EMBED) {
-		float delta_r=(player.hand_mode==EMBED?0.5f*(R1[BLOCK]+R2[BLOCK]):R[BLOCK]);
-		IndexPoint ip=getIntersection(player.pos,dir,delta_r,player.hand_mode==EMBED);
+		float delta_r;
+		IndexPoint ip;
+		delta_r=(player.hand_mode==EMBED?0.5f*(R1[BLOCK]+R2[BLOCK]):R[BLOCK]);
+		ip=getIntersection(player.pos,dir,delta_r,player.hand_mode==EMBED);
+		if(ip.i==-1||particle[ip.i].type==PLANET) {
+			delta_r=R[BLOCK];
+			ip=getIntersection(player.pos,dir,delta_r,false);
+		}
 		if(ip.i==-1)
 			return;
 		glm::vec3 p_center=particle[ip.i].p;
-		particle.push_back(Particle(ip.p,glm::vec3(0.0f),BLOCK,player.is_rough));
+		particle.push_back(Particle(ip.p,glm::vec3(0.0f),BLOCK));
 		return;
 	}
 }
@@ -117,4 +127,4 @@ void mousePass(int x,int y) {
 		if(delta_theta>=0.0f&&camera.theta<MAX_THETA||delta_theta<=0.0f&&camera.theta>MIN_THETA)
 			camera.theta+=delta_theta;
 	}
-}               
+}                   

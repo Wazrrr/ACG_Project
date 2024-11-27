@@ -26,7 +26,7 @@ void drawParticles() {
 		if(it->type!=PLAYER) {
 			glPushMatrix();
 			glTranslatef(it->p.x,it->p.y,it->p.z);
-			if(it->type==PLANAR)
+			if(it->type==PLANET)
 				glutWireSphere(R[it->type],PARTICLE_SLICE_NUM,PARTICLE_STACK_NUM);
 			else
 				glutSolidSphere(R[it->type],PARTICLE_SLICE_NUM,PARTICLE_STACK_NUM);
@@ -51,5 +51,5 @@ void reshape(int width,int height) {
 	glLoadIdentity();
 	gluPerspective(FOVY,float(width)/float(height),Z_NEAR,Z_FAR);
 	glutPostRedisplay();
-}                    
+}                           
 

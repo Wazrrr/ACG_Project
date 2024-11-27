@@ -12,9 +12,7 @@
 
 const int WINDOW_WIDTH=800;
 const int WINDOW_HEIGHT=800;
-const char* WINDOW_TITLE="Á¬Ðø";
-
-const float DT=0.001f;
+const char* WINDOW_TITLE="ACG_project";
 
 //float material_specular[]={1.0f,1.0f,1.0f,1.0f};
 //float material_shininess[]={50.0f}; 
@@ -22,13 +20,15 @@ float light_position[]={1.0f,1.0f,1.0f,0.0f};
 float light_color[]={1.0f,1.0f,1.0f,1.0f};
 float ambient_color[]={0.0f,1.0f,0.0f,1.0f};
 
+extern Player player;
+
 void start() {
 	srand((unsigned)time(NULL));
 	initParticles();
 	initPlayer();
 }
 void loop() {
-	evolution(DT);
+	evolution(player.dt);
 	glutPostRedisplay();
 }
 
@@ -60,5 +60,5 @@ int main(int argc,char* argv[]) {
 	start();
 	glutMainLoop();
 	return 0;
-}                              
+}                                      
 

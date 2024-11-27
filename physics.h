@@ -9,11 +9,11 @@
 
 
 enum ParticleType {
-	PLANAR,PLAYER,BLOCK,MONSTER,NUM_PARTICLE_TYPES
+	PLANET,PLAYER,BLOCK,MONSTER,NUM_PARTICLE_TYPES
 };
-const float R1[NUM_PARTICLE_TYPES]={0.8f,0.32f,0.08f,0.08f};
-const float R2[NUM_PARTICLE_TYPES]={0.9f,0.36f,0.09f,0.09f};
-const float R[NUM_PARTICLE_TYPES]={1.0f,0.4f,0.1f,0.1f};                           // Radius
+const float R1[NUM_PARTICLE_TYPES]={0.8f,0.32f,0.05f,0.08f};
+const float R2[NUM_PARTICLE_TYPES]={0.9f,0.36f,0.05f,0.09f};
+const float R[NUM_PARTICLE_TYPES]={1.0f,0.4f,0.12f,0.1f};                           // Radius
 const float M[NUM_PARTICLE_TYPES]={1000000.0f,1.0f,1.0f,1.0f};                     // Mass
 const float H[NUM_PARTICLE_TYPES]={1000000.0f,100.0f,1.0f,1.0f};                   // Health
 const float HRR[NUM_PARTICLE_TYPES]={0.0f,1.0f,1.0f,1.0f};                         // Health Regenerating Rate
@@ -47,11 +47,10 @@ struct Particle {
 	glm::vec3 v;
 	glm::vec3 F;
 	ParticleType type;
-	bool is_rough;
 	
-	Particle(): p(0.0f),v(0.0f),F(0.0f),type(BLOCK),is_rough(false) {
+	Particle(): p(0.0f),v(0.0f),F(0.0f),type(BLOCK) {
 	}
-	Particle(glm::vec3 _p,glm::vec3 _v,ParticleType _type,bool _is_rough): p(_p),v(_v),F(0.0f),type(_type),is_rough(_is_rough) {
+	Particle(glm::vec3 _p,glm::vec3 _v,ParticleType _type): p(_p),v(_v),F(0.0f),type(_type) {
 	}
 };
 
@@ -85,7 +84,8 @@ struct Player {
 	bool is_inside;
 	HandMode hand_mode;
 	bool is_fine_tuning;
-	bool is_rough;
+	bool is_pausing;
+	float dt;
 }; 
 
 
